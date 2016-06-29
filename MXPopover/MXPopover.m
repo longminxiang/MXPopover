@@ -81,7 +81,6 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
 {
     if (!_containView) {
         _containView = [MXContainView new];
-        _containView.alpha = 0;
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureRecognizerHandle:)];
         [_containView addGestureRecognizer:tap];
     };
@@ -123,22 +122,21 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
     if (self.targetView.superview == self.containView) {
         [self.targetView removeFromSuperview];
     }
-    self.containView.frame = inView.bounds;
-    [self.containView.backgroundView reload];
-    
+    [self.containView addSubview:targetView];
     self.targetView = targetView;
-    [self.containView addSubview:self.targetView];
-
+    
     if (self.containView.superview == inView) {
         [inView bringSubviewToFront:self.containView];
     }
     else {
+        self.containView.frame = inView.bounds;
+        [self.containView.backgroundView reload];
         [inView addSubview:self.containView];
+        self.containView.alpha = 0;
+        [UIView animateWithDuration:0.3 animations:^{
+            self.containView.alpha = 1;
+        }];
     }
-
-    [UIView animateWithDuration:0.3 animations:^{
-        self.containView.alpha = 1;
-    }];
 
     [MXAnimation animatedView:targetView inType:type inDuration:0.5 inDelay:0 extraAnimation:nil completion:completion];
 }
