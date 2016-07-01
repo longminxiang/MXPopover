@@ -46,7 +46,8 @@
     label.text = @"33333333";
     label.center = self.view.center;
     
-    [MXPopover popView:label animationType:MXAnimationFadeIn completion:nil];
+    [MXPopover setBackgroundType:MXPopoverBackgroundTypeNone];
+    [MXPopover popView:label animationType:MXAnimationSlideInBottomCenter completion:nil];
 }
 
 
@@ -57,7 +58,8 @@
     label.text = @"pop up with popover";
     label.center = self.view.center;
 
-    [MXPopover popView:label animationType:MXAnimationFadeIn completion:nil];
+    [MXPopover setBackgroundType:MXPopoverBackgroundTypeBlur];
+    [MXPopover popView:label animationType:MXAnimationSlideInLeftCenter completion:nil];
 }
 
 - (IBAction)dismiss

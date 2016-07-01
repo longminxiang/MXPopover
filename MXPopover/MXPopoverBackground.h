@@ -17,6 +17,4 @@ typedef NS_ENUM(NSUInteger, MXPopoverBackgroundType) {
 
 @property (nonatomic, assign) MXPopoverBackgroundType type;
 
-- (void)reload;
-
 @end

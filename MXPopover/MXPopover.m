@@ -43,6 +43,14 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
     return [super resignFirstResponder];
 }
 
+- (void)removeAllTargetView
+{
+    for (UIView *view in self.subviews) {
+        if (view == self.backgroundView) continue;
+        [view removeFromSuperview];
+    }
+}
+
 - (void)dealloc
 {
     NSLog(@"%@ dealloc", [[self class] description]);
@@ -111,7 +119,7 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
 + (void)setBackgroundType:(MXPopoverBackgroundType)backgroundType
 {
     MXPopover *popover = [self instance];
-    popover.containView.backgroundView.type = backgroundType;
+    popover.backgroundType = backgroundType;
 }
 
 #pragma mark
@@ -119,25 +127,26 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
 
 - (void)animationWithTargetView:(UIView *)targetView inView:(UIView *)inView type:(MXAnimationInType)type completion:(void (^)(void))completion
 {
-    if (self.targetView.superview == self.containView) {
-        [self.targetView removeFromSuperview];
-    }
+    [self.containView removeAllTargetView];
     [self.containView addSubview:targetView];
     self.targetView = targetView;
     
-    if (self.containView.superview == inView) {
-        [inView bringSubviewToFront:self.containView];
-    }
-    else {
+    if (self.containView.superview != inView || self.backgroundType != self.containView.backgroundView.type) {
+        if (self.backgroundType != self.containView.backgroundView.type) {
+            [self.containView removeFromSuperview];
+        }
         self.containView.frame = inView.bounds;
-        [self.containView.backgroundView reload];
+        self.containView.backgroundView.type = self.backgroundType;
         [inView addSubview:self.containView];
+        [inView bringSubviewToFront:self.containView];
         self.containView.alpha = 0;
         [UIView animateWithDuration:0.3 animations:^{
             self.containView.alpha = 1;
         }];
     }
-
+    else {
+        [inView bringSubviewToFront:self.containView];
+    }
     [MXAnimation animatedView:targetView inType:type inDuration:0.5 inDelay:0 extraAnimation:nil completion:completion];
 }
 
@@ -156,10 +165,7 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
     [MXAnimation animatedView:self.targetView out:type outDuration:0.5 outDelay:0 extraAnimation:^{
         self.containView.alpha = 0;
     } completion:^{
-        for (UIView *view in self.containView.subviews) {
-            if (view == self.containView.backgroundView) continue;
-            [view removeFromSuperview];
-        }
+        [self.containView removeAllTargetView];
         [self.containView removeFromSuperview];
         if (completion) completion();
     }];

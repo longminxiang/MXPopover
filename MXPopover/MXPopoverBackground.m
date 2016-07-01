@@ -183,15 +183,11 @@
 {
     if (!self.imageView) {
         UIImageView *imageView = [UIImageView new];
+        imageView.frame = self.bounds;
         [self addSubview:imageView];
         self.imageView = imageView;
     }
     self.imageView.image = [self blurBackgroundImage];
-}
-
-- (void)reload
-{
-    self.type = _type;
 }
 
 - (UIImage *)blurBackgroundImage
