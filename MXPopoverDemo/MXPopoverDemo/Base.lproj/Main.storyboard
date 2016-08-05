@@ -38,12 +38,43 @@
                                     <action selector="popup1" destination="BYZ-38-t0r" eventType="touchUpInside" id="d3h-Ug-MCc"/>
                                 </connections>
                             </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aPg-Qb-6f7">
+                                <rect key="frame" x="0.0" y="300" width="600" height="300"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="11X-DF-Wd6">
+                                        <rect key="frame" x="277" y="114" width="46" height="30"/>
+                                        <state key="normal" title="Button"/>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6jn-Tw-HN8">
+                                        <rect key="frame" x="115" y="107" width="42" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="NT6-bt-k3u">
+                                        <rect key="frame" x="464" y="140" width="20" height="20"/>
+                                    </activityIndicatorView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="300" id="YHM-KA-UHB"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="aPg-Qb-6f7" secondAttribute="trailing" id="fTD-p3-a5e"/>
+                            <constraint firstItem="aPg-Qb-6f7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="qXR-d7-TUl"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="aPg-Qb-6f7" secondAttribute="bottom" id="zOc-qe-fv4"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="bottomView" destination="aPg-Qb-6f7" id="UAR-pG-mxm"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="423" y="361"/>
         </scene>
     </scenes>
 </document>

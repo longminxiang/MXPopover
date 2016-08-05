@@ -167,11 +167,11 @@
     [self.imageView setFrame:self.bounds];
 }
 
-- (void)setType:(MXPopoverBackgroundType)type
+- (void)setType:(MXPopoverBackgroundType)type blurWithView:(UIView *)view
 {
     _type = type;
     if (type == MXPopoverBackgroundTypeBlur) {
-        [self setupImageView];
+        [self setupImageViewWithView:view];
     }
     else {
         [self.imageView removeFromSuperview];
@@ -179,7 +179,7 @@
     }
 }
 
-- (void)setupImageView
+- (void)setupImageViewWithView:(UIView *)view
 {
     if (!self.imageView) {
         UIImageView *imageView = [UIImageView new];
@@ -187,20 +187,14 @@
         [self addSubview:imageView];
         self.imageView = imageView;
     }
-    self.imageView.image = [self blurBackgroundImage];
-}
-
-- (UIImage *)blurBackgroundImage
-{
-    UIWindow *keyWindow = [[UIApplication sharedApplication].delegate window];
-    CGRect rect = [keyWindow bounds];
+    CGRect rect = [view bounds];
     
     UIGraphicsBeginImageContextWithOptions(rect.size, NO, [UIScreen mainScreen].scale);
-    [keyWindow drawViewHierarchyInRect:rect afterScreenUpdates:YES];
+    [view drawViewHierarchyInRect:rect afterScreenUpdates:YES];
     UIImage *capturedScreen = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     UIImage *blurSnapshotImage = [capturedScreen mxp_applyBlurWithRadius:3.0f tintColor:[UIColor colorWithWhite:0.4f alpha:0.6f] saturationDeltaFactor:1.8f maskImage:nil];
-    return blurSnapshotImage;
+    self.imageView.image = blurSnapshotImage;
 }
 
 @end

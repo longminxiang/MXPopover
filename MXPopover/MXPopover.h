@@ -10,20 +10,24 @@
 #import "MXAnimation.h"
 #import "MXPopoverBackground.h"
 
-@interface MXPopover : NSObject
+@interface MXPopover : NSObject<UIGestureRecognizerDelegate>
 
-+ (void)setDisMissType:(MXAnimationOutType)disMissType;
+@property (nonatomic, assign) MXPopoverBackgroundType backgroundType;
 
-+ (void)setTouchedDismissEnable:(BOOL)enable;
+@property (nonatomic, assign) BOOL enableTouchedDismiss;
 
-+ (void)setBackgroundType:(MXPopoverBackgroundType)backgroundType;
+@property (nonatomic, assign) MXAnimationInType showAnimation;
 
-+ (void)popView:(UIView *)view inView:(UIView *)inView animationType:(MXAnimationInType)type completion:(void (^)(void))completion;
+@property (nonatomic, assign) MXAnimationOutType dismissAnimation;
 
-+ (void)popView:(UIView *)view animationType:(MXAnimationInType)type completion:(void (^)(void))completion;
+@end
 
-+ (void)dismissWithType:(MXAnimationOutType)type completion:(void (^)(void))completion;
+@interface UIView (MXPopover)
 
-+ (void)dismiss:(void (^)(void))completion;
+- (void)showPopoverWithView:(UIView *)targetView;
+
+- (void)showPopoverWithView:(UIView *)targetView popover:(void (^)(MXPopover *popover))block;
+
+- (void)dismissPopover;
 
 @end

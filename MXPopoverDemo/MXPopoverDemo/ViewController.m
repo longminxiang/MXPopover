@@ -11,6 +11,8 @@
 
 @interface ViewController ()
 
+@property (nonatomic, weak) IBOutlet UIView *bottomView;
+
 @end
 
 @implementation ViewController
@@ -18,9 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [MXPopover setTouchedDismissEnable:YES];
-    
-    [self afterPopup];
+//    [self afterPopup];
 }
 
 - (void)afterPopup
@@ -46,8 +46,9 @@
     label.text = @"33333333";
     label.center = self.view.center;
     
-    [MXPopover setBackgroundType:MXPopoverBackgroundTypeNone];
-    [MXPopover popView:label animationType:MXAnimationSlideInBottomCenter completion:nil];
+    [self.view showPopoverWithView:label popover:^(MXPopover *popover) {
+        popover.backgroundType = MXPopoverBackgroundTypeNone;
+    }];
 }
 
 
@@ -58,13 +59,12 @@
     label.text = @"pop up with popover";
     label.center = self.view.center;
 
-    [MXPopover setBackgroundType:MXPopoverBackgroundTypeBlur];
-    [MXPopover popView:label animationType:MXAnimationSlideInLeftCenter completion:nil];
+    [self.bottomView showPopoverWithView:label];
 }
 
 - (IBAction)dismiss
 {
-    [MXPopover dismiss:nil];
+    [self.bottomView dismissPopover];
 }
 
 - (void)didReceiveMemoryWarning {

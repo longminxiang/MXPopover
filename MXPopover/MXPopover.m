@@ -7,6 +7,7 @@
 //
 
 #import "MXPopover.h"
+#import <objc/runtime.h>
 
 #pragma mark === MXContainView ===
 
@@ -25,7 +26,6 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
 {
     if (!_backgroundView) {
         _backgroundView = [MXPopoverBackgroundView new];
-        _backgroundView.type = MXPopoverBackgroundTypeBlur;
         [self insertSubview:_backgroundView atIndex:0];
     }
     return _backgroundView;
@@ -51,38 +51,54 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
     }
 }
 
-- (void)dealloc
-{
-    NSLog(@"%@ dealloc", [[self class] description]);
-}
-
 @end
 
 #pragma mark === MXPopver ===
 
-@interface MXPopover ()
+@interface MXPopover ()<UIGestureRecognizerDelegate>
 
 @property (nonatomic, readonly) MXContainView *containView;
 
-@property (nonatomic, assign) BOOL enableTouchedDismiss;
-@property (nonatomic, assign) MXAnimationOutType disMissType;
-@property (nonatomic, assign) MXPopoverBackgroundType backgroundType;
-
 @property (nonatomic, weak) UIView *targetView;
+
+@property (nonatomic, weak) UIView *inView;
+
+@property (nonatomic, copy) void (^showCompletion)();
+
+@property (nonatomic, copy) void (^dismissCompletion)();
 
 @end
 
 @implementation MXPopover
 @synthesize containView = _containView;
 
-+ (instancetype)instance
++ (instancetype)popView:(UIView *)targetView
 {
-    static id object;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        object = [self new];
-    });
-    return object;
+    UIApplication *app = [UIApplication sharedApplication];
+    UIWindow *window = app.keyWindow;
+    if (!window && [app.delegate respondsToSelector:@selector(window)]) {
+        window = [app.delegate window];
+    }
+    return [self popView:targetView inView:window];
+}
+
++ (instancetype)popView:(UIView *)targetView inView:(UIView *)view
+{
+    MXPopover *popover = [MXPopover new];
+    popover.targetView = targetView;
+    popover.inView = view;
+    return popover;
+}
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        self.backgroundType = MXPopoverBackgroundTypeBlur;
+        self.showAnimation = MXAnimationSlideInTopCenter;
+        self.dismissAnimation = MXAnimationSlideOutBottom;
+        self.enableTouchedDismiss = YES;
+    }
+    return self;
 }
 
 - (MXContainView *)containView
@@ -90,106 +106,111 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
     if (!_containView) {
         _containView = [MXContainView new];
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureRecognizerHandle:)];
+        tap.delegate = self;
         [_containView addGestureRecognizer:tap];
     };
     return _containView;
 }
 
-- (void)tapGestureRecognizerHandle:(UIGestureRecognizer *)gesture
+- (void)setTargetView:(UIView *)targetView
 {
-    if (gesture.view == self.targetView || !self.enableTouchedDismiss) return;
-    if (gesture.state == UIGestureRecognizerStateEnded) {
-        [self dismissWithType:self.disMissType completion:nil];
-    }
+    _targetView = targetView;
+    _targetView.autoresizingMask = UIViewAutoresizingNone;
 }
 
-#pragma mark
-#pragma mark === setter ===
-
-+ (void)setDisMissType:(MXAnimationOutType)disMissType
-{
-    [[self instance] setDisMissType:disMissType];
-}
-
-+ (void)setTouchedDismissEnable:(BOOL)enable
-{
-    [[self instance] setEnableTouchedDismiss:enable];
-}
-
-+ (void)setBackgroundType:(MXPopoverBackgroundType)backgroundType
-{
-    MXPopover *popover = [self instance];
-    popover.backgroundType = backgroundType;
-}
-
-#pragma mark
-#pragma mark === animation ===
-
-- (void)animationWithTargetView:(UIView *)targetView inView:(UIView *)inView type:(MXAnimationInType)type completion:(void (^)(void))completion
+- (void)show
 {
     [self.containView removeAllTargetView];
-    [self.containView addSubview:targetView];
-    self.targetView = targetView;
+    [self.containView addSubview:self.targetView];
     
-    if (self.containView.superview != inView || self.backgroundType != self.containView.backgroundView.type) {
+    if (self.containView.superview != self.inView || self.backgroundType != self.containView.backgroundView.type) {
         if (self.backgroundType != self.containView.backgroundView.type) {
             [self.containView removeFromSuperview];
         }
-        self.containView.frame = inView.bounds;
-        self.containView.backgroundView.type = self.backgroundType;
-        [inView addSubview:self.containView];
-        [inView bringSubviewToFront:self.containView];
+        self.containView.frame = self.inView.bounds;
+        [self.containView.backgroundView setType:self.backgroundType blurWithView:self.inView];
+        [self.inView addSubview:self.containView];
+        [self.inView bringSubviewToFront:self.containView];
         self.containView.alpha = 0;
         [UIView animateWithDuration:0.3 animations:^{
             self.containView.alpha = 1;
         }];
     }
     else {
-        [inView bringSubviewToFront:self.containView];
+        [self.inView bringSubviewToFront:self.containView];
     }
-    [MXAnimation animatedView:targetView inType:type inDuration:0.5 inDelay:0 extraAnimation:nil completion:completion];
+    [MXAnimation animatedView:self.targetView inType:self.showAnimation inDuration:0.5 inDelay:0 extraAnimation:nil completion:self.showCompletion];
 }
 
-- (void)animationInWindowWithView:(UIView *)view type:(MXAnimationInType)type completion:(void (^)(void))completion
+- (void)dismiss
 {
-    UIApplication *app = [UIApplication sharedApplication];
-    UIWindow *window = app.keyWindow;
-    if (!window && [app.delegate respondsToSelector:@selector(window)]) {
-        window = [app.delegate window];
-    }
-    [self animationWithTargetView:view inView:window type:type completion:completion];
-}
-
-- (void)dismissWithType:(MXAnimationOutType)type completion:(void (^)(void))completion
-{
-    [MXAnimation animatedView:self.targetView out:type outDuration:0.5 outDelay:0 extraAnimation:^{
+    [MXAnimation animatedView:self.targetView out:self.dismissAnimation outDuration:0.35 outDelay:0 extraAnimation:^{
         self.containView.alpha = 0;
     } completion:^{
         [self.containView removeAllTargetView];
         [self.containView removeFromSuperview];
-        if (completion) completion();
+        if (self.dismissCompletion) self.dismissCompletion();
     }];
 }
 
-+ (void)popView:(UIView *)view inView:(UIView *)inView animationType:(MXAnimationInType)type completion:(void (^)(void))completion
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
-    [[self instance] animationWithTargetView:view inView:inView type:type completion:completion];
+    CGPoint point = [gestureRecognizer locationInView:self.containView];
+    return !CGRectContainsPoint(self.targetView.frame, point) && self.enableTouchedDismiss;
 }
 
-+ (void)popView:(UIView *)view animationType:(MXAnimationInType)type completion:(void (^)(void))completion
+- (void)tapGestureRecognizerHandle:(UIGestureRecognizer *)gesture
 {
-    [[self instance] animationInWindowWithView:view type:type completion:completion];
+    if (gesture.state == UIGestureRecognizerStateEnded) {
+        [self dismiss];
+    }
 }
 
-+ (void)dismissWithType:(MXAnimationOutType)type completion:(void (^)(void))completion
+@end
+
+@interface UIView ()
+
+@property (nonatomic, strong) MXPopover *popover;
+
+@end
+
+@implementation UIView (MXPopover)
+
+- (MXPopover *)popover
 {
-    [[self instance] dismissWithType:type completion:completion];
+    MXPopover *popover = objc_getAssociatedObject(self, _cmd);
+    if (!popover) {
+        popover = [MXPopover new];
+        self.popover = popover;
+    }
+    return popover;
 }
 
-+ (void)dismiss:(void (^)(void))completion
+- (void)setPopover:(MXPopover *)popover
 {
-    MXPopover *popover = [self instance];
-    [popover dismissWithType:popover.disMissType completion:completion];
+    popover.inView = self;
+    __weak typeof(self) weaks = self;
+    [popover setDismissCompletion:^{
+        objc_setAssociatedObject(weaks, @selector(popover), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }];
+    objc_setAssociatedObject(self, @selector(popover), popover, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (void)showPopoverWithView:(UIView *)targetView
+{
+    [self showPopoverWithView:targetView popover:nil];
+}
+
+- (void)showPopoverWithView:(UIView *)targetView popover:(void (^)(MXPopover *popover))block
+{
+    self.popover.targetView = targetView;
+    if (block) block(self.popover);
+    [self.popover show];
+}
+
+- (void)dismissPopover
+{
+    [self.popover dismiss];
 }
 
 @end

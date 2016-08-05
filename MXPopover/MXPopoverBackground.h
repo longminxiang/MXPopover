@@ -15,6 +15,8 @@ typedef NS_ENUM(NSUInteger, MXPopoverBackgroundType) {
 
 @interface MXPopoverBackgroundView : UIView
 
-@property (nonatomic, assign) MXPopoverBackgroundType type;
+@property (nonatomic, readonly) MXPopoverBackgroundType type;
+
+- (void)setType:(MXPopoverBackgroundType)type blurWithView:(UIView *)view;
 
 @end
