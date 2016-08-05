@@ -1,6 +1,5 @@
 //
 //  MXPopoverBackground.h
-//  MXPopoverDemo
 //
 //  Created by eric on 16/6/27.
 //  Copyright © 2016年 Eric Lung. All rights reserved.

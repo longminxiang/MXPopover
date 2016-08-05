@@ -19,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		076F95941D549A8A0063AD41 /* MXPopover.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; name = MXPopover.podspec; path = ../MXPopover.podspec; sourceTree = "<group>"; };
 		07FF7C861D2126FC00707C2E /* MXPopoverDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MXPopoverDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		07FF7C8A1D2126FC00707C2E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		07FF7C8C1D2126FC00707C2E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -51,6 +52,7 @@
 		07FF7C7D1D2126FC00707C2E = {
 			isa = PBXGroup;
 			children = (
+				076F95941D549A8A0063AD41 /* MXPopover.podspec */,
 				07FF7CA01D21271B00707C2E /* MXPopover */,
 				07FF7C881D2126FC00707C2E /* MXPopoverDemo */,
 				07FF7C871D2126FC00707C2E /* Products */,
