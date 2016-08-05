@@ -27,7 +27,7 @@
 
 - (void)showPopoverWithView:(UIView *)targetView popover:(void (^)(MXPopover *popover))block;
 
-- (void)dismissPopover;
+- (void)dismissPopover:(void (^)())completion;
 
 @end
 
@@ -37,6 +37,6 @@
 
 + (void)showPopoverWithView:(UIView *)targetView popover:(void (^)(MXPopover *popover))block;
 
-+ (void)dismissPopover;
++ (void)dismissPopover:(void (^)())completion;
 
 @end

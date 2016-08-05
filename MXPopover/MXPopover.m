@@ -152,10 +152,21 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
 @interface UIView ()
 
 @property (nonatomic, strong) MXPopover *popover;
+@property (nonatomic, copy) void (^popoverDismissBlock)();
 
 @end
 
 @implementation UIView (MXPopover)
+
+- (void)setPopoverDismissBlock:(void (^)())popoverDismissBlock
+{
+    objc_setAssociatedObject(self, @selector(popoverDismissBlock), popoverDismissBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (void (^)())popoverDismissBlock
+{
+    return objc_getAssociatedObject(self, _cmd);
+}
 
 - (MXPopover *)popover
 {
@@ -172,6 +183,7 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
     popover.inView = self;
     __weak typeof(self) weaks = self;
     [popover setDismissCompletion:^{
+        if (weaks.popoverDismissBlock) weaks.popoverDismissBlock();
         objc_setAssociatedObject(weaks, @selector(popover), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }];
     objc_setAssociatedObject(self, @selector(popover), popover, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -189,8 +201,9 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
     [self.popover show];
 }
 
-- (void)dismissPopover
+- (void)dismissPopover:(void (^)())completion
 {
+    self.popoverDismissBlock = completion;
     [self.popover dismiss];
 }
 
@@ -218,9 +231,9 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
     [[self mxp_keyWindow] showPopoverWithView:targetView popover:block];
 }
 
-+ (void)dismissPopover
++ (void)dismissPopover:(void (^)())completion
 {
-    [[self mxp_keyWindow] dismissPopover];
+    [[self mxp_keyWindow] dismissPopover:completion];
 }
 
 @end
