@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "MXPopover"
-  s.version      = "1.0.0"
+  s.version      = "1.0.1"
   s.summary      = "Pop over any view"
   s.description  = "Pop over any view with animation"
   s.homepage     = "https://github.com/longminxiang/MXPopover"

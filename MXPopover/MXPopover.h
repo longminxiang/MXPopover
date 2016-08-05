@@ -30,3 +30,13 @@
 - (void)dismissPopover;
 
 @end
+
+@interface UIView (MXPopoverWindow)
+
++ (void)showPopoverWithView:(UIView *)targetView;
+
++ (void)showPopoverWithView:(UIView *)targetView popover:(void (^)(MXPopover *popover))block;
+
++ (void)dismissPopover;
+
+@end

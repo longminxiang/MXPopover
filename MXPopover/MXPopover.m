@@ -71,24 +71,6 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
 @implementation MXPopover
 @synthesize containView = _containView;
 
-+ (instancetype)popView:(UIView *)targetView
-{
-    UIApplication *app = [UIApplication sharedApplication];
-    UIWindow *window = app.keyWindow;
-    if (!window && [app.delegate respondsToSelector:@selector(window)]) {
-        window = [app.delegate window];
-    }
-    return [self popView:targetView inView:window];
-}
-
-+ (instancetype)popView:(UIView *)targetView inView:(UIView *)view
-{
-    MXPopover *popover = [MXPopover new];
-    popover.targetView = targetView;
-    popover.inView = view;
-    return popover;
-}
-
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -210,6 +192,35 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
 - (void)dismissPopover
 {
     [self.popover dismiss];
+}
+
+@end
+
+@implementation UIView (MXPopoverWindow)
+
++ (UIView *)mxp_keyWindow
+{
+    UIApplication *app = [UIApplication sharedApplication];
+    UIWindow *window = app.keyWindow;
+    if (!window && [app.delegate respondsToSelector:@selector(window)]) {
+        window = [app.delegate window];
+    }
+    return window;
+}
+
++ (void)showPopoverWithView:(UIView *)targetView
+{
+    [[self mxp_keyWindow] showPopoverWithView:targetView];
+}
+
++ (void)showPopoverWithView:(UIView *)targetView popover:(void (^)(MXPopover *popover))block
+{
+    [[self mxp_keyWindow] showPopoverWithView:targetView popover:block];
+}
+
++ (void)dismissPopover
+{
+    [[self mxp_keyWindow] dismissPopover];
 }
 
 @end
