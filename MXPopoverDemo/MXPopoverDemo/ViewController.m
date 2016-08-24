@@ -64,7 +64,7 @@
 
 - (IBAction)dismiss
 {
-    [self.bottomView dismissPopover];
+    [self.bottomView dismissPopover:nil];
 }
 
 - (void)didReceiveMemoryWarning {

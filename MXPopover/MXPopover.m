@@ -183,8 +183,8 @@ typedef void (^MXContainViewTouchedBlock)(MXContainView *mview, UITouch *touch);
     popover.inView = self;
     __weak typeof(self) weaks = self;
     [popover setDismissCompletion:^{
-        if (weaks.popoverDismissBlock) weaks.popoverDismissBlock();
         objc_setAssociatedObject(weaks, @selector(popover), nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        if (weaks.popoverDismissBlock) weaks.popoverDismissBlock();
     }];
     objc_setAssociatedObject(self, @selector(popover), popover, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
