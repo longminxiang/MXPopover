@@ -189,7 +189,7 @@
     CGRect rect = [view bounds];
     
     UIGraphicsBeginImageContextWithOptions(rect.size, NO, [UIScreen mainScreen].scale);
-    [view drawViewHierarchyInRect:rect afterScreenUpdates:YES];
+    [view drawViewHierarchyInRect:rect afterScreenUpdates:NO];
     UIImage *capturedScreen = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     UIImage *blurSnapshotImage = [capturedScreen mxp_applyBlurWithRadius:3.0f tintColor:[UIColor colorWithWhite:0.4f alpha:0.6f] saturationDeltaFactor:1.8f maskImage:nil];
